@@ -95,7 +95,7 @@ Once everything is up and running you can point your Hystrix dashboard to
 How to register a new instance
 -------
 
-Typically, every time you create a new instance of your app (or every time you application starts) you may want to register it into the turbine ecosystem.
+Typically, every time you create a new instance of your app (or every time your application starts) you may want to register it into the turbine ecosystem.
 
 This procedure is very simple and you can do it by executing this POST: 
 
@@ -127,3 +127,12 @@ java
     -Dserver.port=80
     -jar RESTful-turbine.jar
 ```
+
+LICENSE
+-----
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
