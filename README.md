@@ -37,6 +37,8 @@ But, this isn't very useful if your company is not using Eureka. So you may want
 
 If your application is mounted over AWS you can use the official **AwsInstanceDiscovery** provided by **turbine-contrib**.
 
+-------
+
 Though all these options are great, what happens if you are using neither AWS nor Eureka. Is your team condemned to waste such long hours keeping every config file up to date?
 
 This is when RESTful-turbine becomes handy, it gives you the possibility of adding and deleting instances or clusters by sending some requests over HTTP. For example, if you want to register a new instance you can simply do:
