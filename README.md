@@ -37,7 +37,9 @@ But, this isn't very useful if your company is not using Eureka. So you may want
 
 If your application is mounted over AWS you can use the official **AwsInstanceDiscovery** provided by **turbine-contrib**.
 
-Though all these options are great, what happens if you are using neither AWS nor Eureka. Is your team condemned to waste such long hours keeping every config file up to date?
+-------
+
+Though all these options are great, what happens if you are using neither AWS nor Eureka? Is your team condemned to waste such long hours keeping every config file up to date?
 
 This is when RESTful-turbine becomes handy, it gives you the possibility of adding and deleting instances or clusters by sending some requests over HTTP. For example, if you want to register a new instance you can simply do:
 
@@ -136,3 +138,5 @@ Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+=======
+
