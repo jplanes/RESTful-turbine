@@ -1,5 +1,6 @@
 package com.github.jplanes.restful.turbine.stores;
 
+import com.github.jplanes.restful.turbine.stores.datasource.PropertiesDataSource;
 import com.netflix.turbine.discovery.Instance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.Collection;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.lang.String.format;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
@@ -28,8 +30,9 @@ public class InstancesStore {
     }
 
     public Collection<Instance> findAll(String cluster) {
+        String key = format("turbine.ConfigPropertyBasedDiscovery.%s.instances", cluster);
         return
-                java.util.Optional.ofNullable(this.properties.getInstancesInCluster(cluster))
+                java.util.Optional.ofNullable(key)
                 .map(propertyValue ->
                         newArrayList(propertyValue.trim().split(",")).stream()
                         .map(instanceName -> new Instance(instanceName, cluster, true))
@@ -44,7 +47,9 @@ public class InstancesStore {
 
         instances.add(instance);
         String instancesAsString = instances.stream().map(Instance::getHostname).collect(joining(","));
-        this.properties.setInstancesInCluster(instance.getCluster(), instancesAsString);
+
+        String key = format("turbine.ConfigPropertyBasedDiscovery.%s.instances", instance.getCluster());
+        this.properties.set(key, instancesAsString);
     }
 
     public void delete(Instance instance) {
@@ -55,7 +60,8 @@ public class InstancesStore {
                                            })
                                            .map(Instance::getHostname).collect(joining(","));
 
-        this.properties.setInstancesInCluster(instance.getCluster(), remainingInstancesInCluster);
+        String key = format("turbine.ConfigPropertyBasedDiscovery.%s.instances", instance.getCluster());
+        this.properties.set(key, remainingInstancesInCluster);
     }
 
 }
