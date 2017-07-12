@@ -9,10 +9,12 @@ import static com.fasterxml.jackson.databind.PropertyNamingStrategy.CAMEL_CASE_T
 
 @Configuration
 public class ObjectMapperConfig {
+
     @Bean
     public ObjectMapper jacksonObjectMapper() {
         return new ObjectMapper()
                 .setPropertyNamingStrategy(CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES)
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
+
 }

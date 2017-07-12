@@ -1,4 +1,4 @@
-package com.github.jplanes.restful.turbine.controllers.dto;
+package com.github.jplanes.restful.turbine.api.dto;
 
 public class InstanceDTO {
         private String host;

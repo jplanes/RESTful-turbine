@@ -1,6 +1,7 @@
-package com.github.jplanes.restful.turbine.controllers;
+package com.github.jplanes.restful.turbine.api;
 
-import com.github.jplanes.restful.turbine.controllers.dto.InstanceDTO;
+import com.github.jplanes.restful.turbine.api.dto.InstanceDTO;
+import com.github.jplanes.restful.turbine.api.exceptions.InvalidBodyException;
 import com.github.jplanes.restful.turbine.services.InstanceRegistrationService;
 import com.netflix.turbine.discovery.Instance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,12 @@ public class InstancesController {
 
     @RequestMapping(method = POST)
     public void createNew(@RequestBody(required = true) InstanceDTO instance) {
+        if(instance.getHost() == null || instance.getHost().trim().equals(""))
+            throw new InvalidBodyException("The host field is required.");
+
+        if(instance.getCluster() == null || instance.getCluster().trim().equals(""))
+            throw new InvalidBodyException("The cluster field is required");
+
         this.instanceRegistration.registerInstance(new Instance(instance.getHost(), instance.getCluster(), true));
     }
 
@@ -40,7 +47,5 @@ public class InstancesController {
     public void delete(@PathVariable String clusterName, @PathVariable String instanceName) {
         this.instanceRegistration.unregisterInstance(new Instance(instanceName, clusterName, true));
     }
-
-
 
 }
