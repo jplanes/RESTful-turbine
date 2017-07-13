@@ -4,13 +4,13 @@ RESTful-Turbine
 Intro
 -------
 
-The aim of this project is to let developers configure and run a turbine server in a straightforward way by letting them adding or removing instances on the fly.
+The aim of this project is to let developers configure and run a turbine server in a straightforward way by adding or removing hystrix instances on the fly.
 
-The official distribution of turbine provides 3 different ways for discovering new instances:
+The [official distribution of turbine](https://github.com/Netflix/Turbine) provides 3 different ways for instance discovering:
 
-#### 1. Configuration File
+#### 1. FileBasedInstanceDiscovery
 
-By using this strategy you can specify a **config.properties** file in your classpath with all the information about your clusters and instances. Typically, this configuration file will look like this:
+By using [this strategy](https://github.com/Netflix/Turbine/wiki/Configuration-(1.x)#filebasedinstancediscovery-impl) you can set up a **config.properties** file in your classpath with all your application clusters and instances. Typically, this configuration file will look like this:
 
 ```
 
@@ -21,27 +21,28 @@ turbine.ConfigPropertyBasedDiscovery.app_1.instances=instance_1_app_1,instance_2
 turbine.ConfigPropertyBasedDiscovery.app_2.instances=instance_1_app_2,instance_2_app_2
 
 ```
-As you may notice, this is very easy to configure but if your company has an elastic infrastructure your team will be losing several hours a week maintaining this file up to date. 
+As you may notice, this is very easy to configure but if you are working inside an elastic infrastructure you will be losing several hours a week maintaining this file up to date. Because you have to update this file content each time you shrink or enlarge any cluster. 
 
-#### 2. Eureka auto-discovery
+#### 2. EurekaInstanceDiscovery
 
-If your company is using Netflix Eureka maybe this would be your first choice. You can tell Turbine to load the EurekaInstanceDiscovery by adding this line to the turbine configuration file:
+You may want to take a look at [this instance discovery strategy](https://github.com/Netflix/Turbine/wiki/Configuration-(1.x)#eurekainstancediscovery-impl) if you are using [Eureka](https://github.com/Netflix/eureka). This strategy will listen to every change inside your infrastructure and register new monitors for each new instance:
 
 ```
 InstanceDiscovery.impl=com.netflix.turbine.discovery.EurekaInstanceDiscovery.class
 ```
 
-But, this isn't very useful if your company is not using Eureka. So you may want to continue reading :wink:
+But what happens if you aren't using Eureka?
 
-#### 3. AWS Instance Discovery
+#### 3. AwsInstanceDiscovery
 
-If your application is mounted over AWS you can use the official **AwsInstanceDiscovery** provided by **turbine-contrib**.
+If your application is mounted over AWS you can use the [AwsInstanceDiscovery](https://javalibs.com/artifact/com.netflix.turbine/turbine-contrib?className=com.netflix.turbine.discovery.AwsInstanceDiscovery&source) provided by [turbine-contrib](https://mvnrepository.com/artifact/com.netflix.turbine/turbine-contrib/1.0.0).
+This InstanceDiscovery will listen for changes on every AutoScallingGroup and automatically add/remove instances.
 
 -------
 
-Though all these options are great, what happens if you are using neither AWS nor Eureka? Is your team condemned to waste such long hours keeping every config file up to date?
+Though all these options are great, what happens if you are using neither AWS nor Eureka? Are you condemned to waste such a long hours keeping every config file up to date?
 
-This is when RESTful-turbine becomes handy, it gives you the possibility of adding and deleting instances or clusters by sending some requests over HTTP. For example, if you want to register a new instance you can simply do:
+This is when RESTful-turbine becomes handy, it gives you the possibility to add or remove instances or clusters by sending some requests over HTTP. For example, if you want to register a new instance you can simply do:
 
 ```
 curl 
@@ -51,14 +52,14 @@ curl
     http://localhost:8080/instances
 ```
 
-Or, if you want to see all instances for an specific cluster:
+Or, if you want to see all instances in a specific cluster:
 
 ```
 curl http://localhost:8080/instances\?cluster\=app_name
 [{"host":"instance_ip","cluster":"app_name"}]
 ```
 
-So, every time your cluster scales or shrinks you can trigger a POST | DELETE request to this API and turbine will start or stop monitoring new instances.
+So, every time your cluster scales or shrinks you can trigger a POST | DELETE request to this API and turbine will start or stop monitoring the instance.
  
 How to run RESTful-turbine
 -------
@@ -71,9 +72,9 @@ curl
     -o RESTful-turbine.jar
 ```
 
-Once you have downloaded it you may want to set up a configuration file. RESTful-turbine is 100% compatible with Turbine, the only configuration we don't back up is the one related to clusters and instances declaration (because we use our own InstanceDiscovery strategy).
+Once you have downloaded it you may want to set up a configuration file. RESTful-turbine is 100% compatible with Turbine & [Archaius](https://github.com/Netflix/archaius/wiki/Getting-Started), the only configuration we don't back up is the one related to clusters and instance declaration (because we use our own InstanceDiscovery strategy).
  
- A typical configuration file will look like:
+ A typical configuration file will look like this:
 
 ```
 ##### Turbine configuration
@@ -83,7 +84,7 @@ turbine.instanceUrlSuffix=:5000/hystrix.stream
 turbine.instanceHealthCheck=:5000/health
 ```
 
-The last but not least step is to actually run the turbine server. You can run it by simply executing this command:
+The last (but not least) step is to actually run the turbine server. You can run it by simply executing this command:
 
 ```
 java 
@@ -97,7 +98,7 @@ Once everything is up and running you can point your Hystrix dashboard to
 How to register a new instance
 -------
 
-Typically, every time you create a new instance of your app (or every time your application starts) you may want to register it into the turbine ecosystem.
+Typically, every time you create a new instance (or every time your application starts) you may want to register it into the turbine stream aggregator.
 
 This procedure is very simple and you can do it by executing this POST: 
 
@@ -112,7 +113,7 @@ curl
 How to unregister an instance
 -------
 
-If you are having some issues and you want to shrink your cluster, or if you simply realized your application doesn't need so many servers, you can shut down your app in some of them and delete them from monitoring by just sending a DELETE request to:
+If you are having some issues and you want to shrink your cluster, or if you simply realized your application doesn't need so many servers, you can shut down some instances and delete them from the monitor by just sending a DELETE request to:
 
 ```
 curl -X "DELETE" HTTP://localhost:8080/instances/{cluster_name}/{instance_name}
