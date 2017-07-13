@@ -1,5 +1,6 @@
 package com.github.jplanes.restful.turbine.stores;
 
+import com.github.jplanes.restful.turbine.stores.datasource.KeyValueDataSource;
 import com.github.jplanes.restful.turbine.stores.datasource.PropertiesDataSource;
 import com.netflix.turbine.discovery.Instance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +16,12 @@ import static java.util.stream.Collectors.toList;
 @Component
 public class InstancesStore {
     private ClustersStore clustersStore;
-    private PropertiesDataSource properties;
+    private KeyValueDataSource dataSource;
 
     @Autowired
-    public InstancesStore(ClustersStore clustersStore, PropertiesDataSource properties) {
+    public InstancesStore(ClustersStore clustersStore, KeyValueDataSource dataSource) {
         this.clustersStore = clustersStore;
-        this.properties = properties;
+        this.dataSource = dataSource;
     }
 
     public Collection<Instance> findAll() {
@@ -32,7 +33,7 @@ public class InstancesStore {
     public Collection<Instance> findAll(String cluster) {
         String key = format("turbine.ConfigPropertyBasedDiscovery.%s.instances", cluster);
         return
-                java.util.Optional.ofNullable(key)
+                java.util.Optional.ofNullable(dataSource.get(key))
                 .map(propertyValue ->
                         newArrayList(propertyValue.trim().split(",")).stream()
                         .map(instanceName -> new Instance(instanceName, cluster, true))
@@ -49,7 +50,7 @@ public class InstancesStore {
         String instancesAsString = instances.stream().map(Instance::getHostname).collect(joining(","));
 
         String key = format("turbine.ConfigPropertyBasedDiscovery.%s.instances", instance.getCluster());
-        this.properties.set(key, instancesAsString);
+        this.dataSource.set(key, instancesAsString);
     }
 
     public void delete(Instance instance) {
@@ -61,7 +62,7 @@ public class InstancesStore {
                                            .map(Instance::getHostname).collect(joining(","));
 
         String key = format("turbine.ConfigPropertyBasedDiscovery.%s.instances", instance.getCluster());
-        this.properties.set(key, remainingInstancesInCluster);
+        this.dataSource.set(key, remainingInstancesInCluster);
     }
 
 }
